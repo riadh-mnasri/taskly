@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-users-table
+      author: taskly
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(254)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: hashed_password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_users_email
+            tableName: users
+            columns:
+              - column:
+                  name: email

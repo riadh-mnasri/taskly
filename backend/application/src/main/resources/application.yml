@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: taskly
+
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskly
+    username: taskly
+    password: taskly_secret
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/master.yaml
+    enabled: true
+
+taskly:
+  jwt:
+    # WARNING: This is a dev-only secret. Never commit real secrets to production repositories.
+    # In production, inject via environment variable: TASKLY_JWT_SECRET
+    secret: "taskly-dev-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-security"
+    access-token-expiry-seconds: 900      # 15 minutes
+    refresh-token-expiry-seconds: 604800  # 7 days
+
+server:
+  port: 8081
+  error:
+    include-message: always
+    include-binding-errors: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.taskly: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

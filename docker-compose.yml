@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskly-postgres
+    environment:
+      POSTGRES_DB: taskly
+      POSTGRES_USER: taskly
+      POSTGRES_PASSWORD: taskly_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - taskly_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskly -d taskly"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: taskly-mailhog
+    ports:
+      - "1025:1025"   # SMTP server
+      - "8025:8025"   # Web UI
+    restart: unless-stopped
+
+volumes:
+  taskly_postgres_data:
+    name: taskly_postgres_data
