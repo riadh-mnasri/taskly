@@ -15,7 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TaskStore } from '../data/task.store';
 import { PriorityBadgeComponent } from '../components/priority-badge.component';
 import { TaskFormDialogComponent } from '../components/task-form-dialog.component';
-import { Task, CreateTaskRequest, TASK_STATUS_LABELS } from '../../../core/models/task.model';
+import { Task, TaskFormResult, TASK_STATUS_LABELS } from '../../../core/models/task.model';
 
 @Component({
   selector: 'app-tasks-list',
@@ -215,8 +215,8 @@ export class TasksListPage implements OnInit {
       maxWidth: '640px',
       width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.createTask(result).then(() => this.applyFilters());
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.createTask(result.request).then(() => this.applyFilters());
     });
   }
 
@@ -226,8 +226,8 @@ export class TasksListPage implements OnInit {
       maxWidth: '640px',
       width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.updateTask(task.id, result);
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.updateTask(task.id, result.request);
     });
   }
 

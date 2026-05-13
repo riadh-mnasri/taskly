@@ -8,7 +8,7 @@ import { RouterLink } from '@angular/router';
 import { TaskStore } from '../data/task.store';
 import { TaskCardComponent } from '../components/task-card.component';
 import { TaskFormDialogComponent } from '../components/task-form-dialog.component';
-import { Task, CreateTaskRequest } from '../../../core/models/task.model';
+import { Task, TaskFormResult } from '../../../core/models/task.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -197,8 +197,8 @@ export class DashboardPage implements OnInit {
       maxWidth: '640px',
       width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.createTask(result);
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.createTask(result.request);
     });
   }
 
@@ -208,8 +208,8 @@ export class DashboardPage implements OnInit {
       maxWidth: '640px',
       width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.updateTask(task.id, result);
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.updateTask(task.id, result.request);
     });
   }
 

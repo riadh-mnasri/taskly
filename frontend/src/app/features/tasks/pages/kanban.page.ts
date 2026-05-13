@@ -14,7 +14,7 @@ import { TaskStore } from '../data/task.store';
 import { TaskService } from '../data/task.service';
 import { TaskCardComponent } from '../components/task-card.component';
 import { TaskFormDialogComponent } from '../components/task-form-dialog.component';
-import { Task, TaskStatus, CreateTaskRequest } from '../../../core/models/task.model';
+import { Task, TaskStatus, TaskFormResult } from '../../../core/models/task.model';
 
 @Component({
   selector: 'app-kanban',
@@ -189,8 +189,8 @@ export class KanbanPage implements OnInit {
     const ref = this.dialog.open(TaskFormDialogComponent, {
       data: {}, maxWidth: '640px', width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.createTask(result).then(() => this.syncFromStore());
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.createTask(result.request).then(() => this.syncFromStore());
     });
   }
 
@@ -198,8 +198,8 @@ export class KanbanPage implements OnInit {
     const ref = this.dialog.open(TaskFormDialogComponent, {
       data: { task }, maxWidth: '640px', width: '95vw'
     });
-    ref.afterClosed().subscribe((result: CreateTaskRequest | undefined) => {
-      if (result) this.store.updateTask(task.id, result).then(() => this.syncFromStore());
+    ref.afterClosed().subscribe((result: TaskFormResult | undefined) => {
+      if (result) this.store.updateTask(task.id, result.request).then(() => this.syncFromStore());
     });
   }
 
