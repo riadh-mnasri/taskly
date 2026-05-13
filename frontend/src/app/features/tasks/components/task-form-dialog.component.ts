@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { Component, HostListener, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -6,10 +6,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Task, Priority, TaskType, TaskStatus, CreateTaskRequest, TaskFormResult } from '../../../core/models/task.model';
 
 export interface TaskFormDialogData {
@@ -27,7 +27,7 @@ export interface TaskFormDialogData {
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule,
+    MatTooltipModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule
@@ -85,9 +85,14 @@ export interface TaskFormDialogData {
 
           <mat-form-field appearance="outline">
             <mat-label>Date limite</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="dueDate" [min]="minDate">
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
+            <input matInput [matDatepicker]="picker" formControlName="dueDate"
+                   [min]="minDate" placeholder="jj/mm/aaaa" readonly
+                   style="cursor:pointer" (click)="picker.open()">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"
+              matTooltip="Ouvrir le calendrier"></mat-datepicker-toggle>
+            <mat-datepicker #picker [touchUi]="isMobile" startView="month"
+                            color="primary"></mat-datepicker>
+            <mat-hint>Cliquez sur l'icône pour ouvrir le calendrier</mat-hint>
             <mat-error *ngIf="form.get('dueDate')?.hasError('required')">La date est requise</mat-error>
           </mat-form-field>
         </div>
@@ -141,6 +146,10 @@ export class TaskFormDialogComponent implements OnInit {
 
   form!: FormGroup;
   minDate = new Date();
+  isMobile = window.innerWidth < 768;
+
+  @HostListener('window:resize')
+  onResize() { this.isMobile = window.innerWidth < 768; }
 
   get isEdit(): boolean {
     return !!this.data.task;
