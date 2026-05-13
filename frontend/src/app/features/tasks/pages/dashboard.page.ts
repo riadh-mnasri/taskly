@@ -9,6 +9,7 @@ import { TaskStore } from '../data/task.store';
 import { TaskCardComponent } from '../components/task-card.component';
 import { TaskFormDialogComponent } from '../components/task-form-dialog.component';
 import { Task, TaskFormResult } from '../../../core/models/task.model';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,7 +29,7 @@ import { Task, TaskFormResult } from '../../../core/models/task.model';
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl font-extrabold text-gray-900">
-            {{ greeting }} {{ timeEmoji }}
+            {{ greeting }}<span *ngIf="userName()">, {{ userName() }}</span> {{ timeEmoji }}
           </h1>
           <p class="text-gray-400 text-sm mt-1">{{ today }}</p>
         </div>
@@ -168,6 +169,8 @@ import { Task, TaskFormResult } from '../../../core/models/task.model';
 export class DashboardPage implements OnInit {
   readonly store = inject(TaskStore);
   private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
+  readonly userName = this.auth.currentUserName;
 
   readonly today = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'

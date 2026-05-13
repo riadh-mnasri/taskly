@@ -23,6 +23,19 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this._accessToken() !== null);
   readonly accessToken = this._accessToken.asReadonly();
 
+  readonly currentUserName = computed(() => {
+    const token = this._accessToken();
+    if (!token) return '';
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const email: string = payload['email'] ?? '';
+      const namePart = email.split('@')[0].split('.')[0];
+      return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    } catch {
+      return '';
+    }
+  });
+
   signUp(request: SignUpRequest): Observable<SignUpResponse> {
     return this.http.post<SignUpResponse>(`${this.apiUrl}/sign-up`, request);
   }
