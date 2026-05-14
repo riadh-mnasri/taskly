@@ -1,11 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/auth/auth.service';
+import { GamificationStore } from '../gamification/gamification.store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -21,7 +23,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   styles: [`
     .nav-link {
@@ -94,6 +97,23 @@ import { toSignal } from '@angular/core/rxjs-interop';
           </a>
         </nav>
 
+        <!-- XP bar -->
+        <div *ngIf="gamificationStore.progress() as p" class="mx-4 mb-3 px-3 py-3 rounded-xl" style="background:rgba(255,255,255,0.08);">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-purple-200 text-xs font-bold">Niveau {{ p.level }} — {{ p.levelName }}</span>
+            <span class="text-purple-300 text-xs">{{ p.xp }} XP</span>
+          </div>
+          <div class="w-full rounded-full overflow-hidden" style="height:6px;background:rgba(255,255,255,0.15);">
+            <div class="h-full rounded-full transition-all duration-500"
+                 style="background:linear-gradient(90deg,#a78bfa,#f0abfc);"
+                 [style.width.%]="getXpPercent(p)">
+            </div>
+          </div>
+          <div class="text-purple-400 text-xs mt-1 text-right" *ngIf="p.level < 5">
+            {{ p.xpForNextLevel - p.xp }} XP pour le niveau {{ p.level + 1 }}
+          </div>
+        </div>
+
         <!-- User -->
         <div class="border-t mx-4 mb-2" style="border-color:rgba(255,255,255,0.1);padding-top:16px;">
           <button
@@ -156,10 +176,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
     </div>
   `
 })
-export class AppShellComponent {
+export class AppShellComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly gamificationStore = inject(GamificationStore);
 
   readonly currentYear = new Date().getFullYear();
 
@@ -167,6 +189,22 @@ export class AppShellComponent {
     this.breakpointObserver.observe(Breakpoints.Handset).pipe(map(r => r.matches)),
     { initialValue: false }
   );
+
+  ngOnInit(): void {
+    this.gamificationStore.loadProgress().then(() => {
+      const newBadges = this.gamificationStore.newBadges();
+      newBadges.forEach(badge => {
+        this.snackBar.open(`🏅 Nouveau badge : ${badge}`, '✕', { duration: 5000, panelClass: ['badge-snack'] });
+      });
+      if (newBadges.length) this.gamificationStore.clearNewBadges();
+    });
+  }
+
+  getXpPercent(p: { xp: number; xpForCurrentLevel: number; xpForNextLevel: number }): number {
+    const range = p.xpForNextLevel - p.xpForCurrentLevel;
+    if (range <= 0) return 100;
+    return Math.min(100, Math.round(((p.xp - p.xpForCurrentLevel) / range) * 100));
+  }
 
   signOut(): void {
     this.authService.signOut();

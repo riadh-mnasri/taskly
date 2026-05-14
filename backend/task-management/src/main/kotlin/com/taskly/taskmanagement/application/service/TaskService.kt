@@ -1,5 +1,6 @@
 package com.taskly.taskmanagement.application.service
 
+import com.taskly.sharedkernel.domain.event.TaskCompletedEvent
 import com.taskly.sharedkernel.domain.model.UserId
 import com.taskly.taskmanagement.domain.exception.TaskAccessDeniedException
 import com.taskly.taskmanagement.domain.exception.TaskNotFoundException
@@ -23,9 +24,11 @@ import com.taskly.taskmanagement.domain.port.outbound.SortDirection
 import com.taskly.taskmanagement.domain.port.outbound.SortField
 import com.taskly.taskmanagement.domain.port.outbound.TaskFilter
 import com.taskly.taskmanagement.domain.port.outbound.TaskRepository
+import org.springframework.context.ApplicationEventPublisher
 
 class TaskService(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val eventPublisher: ApplicationEventPublisher
 ) : CreateTaskUseCase,
     UpdateTaskUseCase,
     DeleteTaskUseCase,
@@ -84,12 +87,18 @@ class TaskService(
 
     override fun markAsDone(taskId: String, userId: UserId): Task {
         val task = requireOwnedTask(taskId, userId)
-        return taskRepository.save(task.markAsDone())
+        val saved = taskRepository.save(task.markAsDone())
+        eventPublisher.publishEvent(TaskCompletedEvent(userId.toString(), taskId, task.priority.name))
+        return saved
     }
 
     override fun changeStatus(taskId: String, userId: UserId, newStatus: TaskStatus): Task {
         val task = requireOwnedTask(taskId, userId)
-        return taskRepository.save(task.changeStatus(newStatus))
+        val saved = taskRepository.save(task.changeStatus(newStatus))
+        if (newStatus == TaskStatus.DONE) {
+            eventPublisher.publishEvent(TaskCompletedEvent(userId.toString(), taskId, task.priority.name))
+        }
+        return saved
     }
 
     private fun requireOwnedTask(taskId: String, userId: UserId): Task {

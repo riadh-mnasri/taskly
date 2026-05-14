@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":shared-kernel"))
     implementation(project(":identity"))
     implementation(project(":task-management"))
+    implementation(project(":gamification"))
 
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.data.jpa)

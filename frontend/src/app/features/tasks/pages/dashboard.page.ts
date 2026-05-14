@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { TaskStore } from '../data/task.store';
@@ -10,6 +11,8 @@ import { TaskCardComponent } from '../components/task-card.component';
 import { TaskFormDialogComponent } from '../components/task-form-dialog.component';
 import { Task, TaskFormResult } from '../../../core/models/task.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { GamificationStore } from '../../gamification/gamification.store';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +23,9 @@ import { AuthService } from '../../../core/auth/auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
     TaskCardComponent,
+    MatTooltipModule,
   ],
   template: `
     <div class="p-6 max-w-6xl mx-auto">
@@ -90,6 +95,27 @@ import { AuthService } from '../../../core/auth/auth.service';
         <div>
           <p class="font-bold text-emerald-800">Rien d'urgent aujourd'hui !</p>
           <p class="text-emerald-600 text-sm">Tu es à jour. Profite ou prends de l'avance sur tes prochains devoirs.</p>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div *ngIf="gamificationStore.progress() as p" class="mb-8">
+        <h2 class="font-bold text-gray-700 mb-3 flex items-center gap-2 text-base">
+          <span class="text-xl">🏅</span> Mes badges
+          <span class="ml-auto text-sm text-gray-400 font-normal">{{ p.totalTasksDone }} tâche(s) terminée(s)</span>
+        </h2>
+        <div class="flex flex-wrap gap-3">
+          <div *ngFor="let badge of p.badges"
+               class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
+               style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;color:#5b21b6;"
+               [matTooltip]="badge.description">
+            <span class="text-lg">{{ badge.emoji }}</span>
+            {{ badge.label }}
+          </div>
+          <div *ngIf="p.badges.length === 0"
+               class="text-sm text-gray-400 py-2">
+            Complète des tâches pour débloquer tes premiers badges !
+          </div>
         </div>
       </div>
 
@@ -168,7 +194,9 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class DashboardPage implements OnInit {
   readonly store = inject(TaskStore);
+  readonly gamificationStore = inject(GamificationStore);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly auth = inject(AuthService);
   readonly userName = this.auth.currentUserName;
 
@@ -223,6 +251,13 @@ export class DashboardPage implements OnInit {
   }
 
   markDone(task: Task): void {
-    this.store.updateTaskStatus(task.id, 'DONE');
+    this.store.updateTaskStatus(task.id, 'DONE').then(async () => {
+      await this.gamificationStore.loadProgress();
+      const newBadges = this.gamificationStore.newBadges();
+      newBadges.forEach(badge => {
+        this.snackBar.open(`🏅 Nouveau badge : ${badge}`, '✕', { duration: 5000 });
+      });
+      if (newBadges.length) this.gamificationStore.clearNewBadges();
+    });
   }
 }

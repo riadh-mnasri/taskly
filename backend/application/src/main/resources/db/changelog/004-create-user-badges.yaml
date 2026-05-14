@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-user-badges
+      author: taskly
+      changes:
+        - createTable:
+            tableName: user_badges
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: VARCHAR(36)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: badge_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: earned_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: user_badges
+            columnNames: user_id, badge_code
+            constraintName: uq_user_badge

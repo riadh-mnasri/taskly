@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-user-progress
+      author: taskly
+      changes:
+        - createTable:
+            tableName: user_progress
+            columns:
+              - column:
+                  name: user_id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: xp
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_tasks_done
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: high_priority_done
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

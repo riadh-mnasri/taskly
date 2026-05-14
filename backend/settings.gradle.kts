@@ -4,5 +4,6 @@ include(
     "shared-kernel",
     "identity",
     "task-management",
+    "gamification",
     "application"
 )

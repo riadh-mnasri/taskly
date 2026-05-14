@@ -23,12 +23,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.springframework.context.ApplicationEventPublisher
 import java.time.Instant
 import java.time.LocalDate
 
 class TaskServiceTest {
 
     private val taskRepository: TaskRepository = mock()
+    private val eventPublisher: ApplicationEventPublisher = mock()
     private lateinit var service: TaskService
 
     private val userId = UserId.generate()
@@ -36,7 +38,7 @@ class TaskServiceTest {
 
     @BeforeEach
     fun setUp() {
-        service = TaskService(taskRepository)
+        service = TaskService(taskRepository, eventPublisher)
     }
 
     private fun buildExistingTask(ownerId: UserId = userId) = Task.reconstitute(
