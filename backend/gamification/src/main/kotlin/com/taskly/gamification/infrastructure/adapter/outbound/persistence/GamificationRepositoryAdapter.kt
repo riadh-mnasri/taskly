@@ -1,14 +1,17 @@
 package com.taskly.gamification.infrastructure.adapter.outbound.persistence
 
 import com.taskly.gamification.domain.model.BadgeCode
+import com.taskly.gamification.domain.model.DayStat
 import com.taskly.gamification.domain.model.EarnedBadge
 import com.taskly.gamification.domain.port.outbound.UserProgressRepository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Transactional
 class GamificationRepositoryAdapter(
     private val progressRepo: UserProgressJpaRepository,
-    private val badgeRepo: UserBadgeJpaRepository
+    private val badgeRepo: UserBadgeJpaRepository,
+    private val dailyRepo: DailyCompletionJpaRepository
 ) : UserProgressRepository {
 
     override fun initIfAbsent(userId: String) {
@@ -37,4 +40,11 @@ class GamificationRepositoryAdapter(
 
     override fun findBadges(userId: String): List<EarnedBadge> =
         badgeRepo.findAllByUserId(userId).map { EarnedBadge(it.badgeCode, it.earnedAt) }
+
+    override fun recordDailyCompletion(userId: String, xp: Int) {
+        dailyRepo.upsertToday(userId, xp)
+    }
+
+    override fun findDailySince(userId: String, from: LocalDate): List<DayStat> =
+        dailyRepo.findSince(userId, from).map { DayStat(it.completionDate, it.count, it.xpGained) }
 }

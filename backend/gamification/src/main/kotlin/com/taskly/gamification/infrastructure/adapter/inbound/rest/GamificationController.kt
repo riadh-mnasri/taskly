@@ -1,7 +1,7 @@
 package com.taskly.gamification.infrastructure.adapter.inbound.rest
 
 import com.taskly.gamification.application.GamificationService
-import com.taskly.gamification.domain.model.BadgeCode
+import com.taskly.gamification.application.UserStats
 import com.taskly.gamification.domain.model.EarnedBadge
 import com.taskly.gamification.domain.model.UserProgress
 import io.swagger.v3.oas.annotations.Operation
@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @RestController
@@ -21,10 +22,13 @@ class GamificationController(private val service: GamificationService) {
 
     @GetMapping("/me")
     @Operation(summary = "Get current user progress")
-    fun getMyProgress(auth: Authentication): UserProgressResponse {
-        val progress = service.getProgress(auth.principal as String)
-        return progress.toResponse()
-    }
+    fun getMyProgress(auth: Authentication): UserProgressResponse =
+        service.getProgress(auth.principal as String).toResponse()
+
+    @GetMapping("/me/stats")
+    @Operation(summary = "Get stats for the current user (last 7 days + streak)")
+    fun getMyStats(auth: Authentication): StatsResponse =
+        service.getStats(auth.principal as String).toResponse()
 }
 
 data class UserProgressResponse(
@@ -45,6 +49,20 @@ data class BadgeResponse(
     val earnedAt: LocalDateTime
 )
 
+data class StatsResponse(
+    val last7Days: List<DayStatResponse>,
+    val streak: Int,
+    val xpThisWeek: Int,
+    val xpLastWeek: Int,
+    val completionsThisWeek: Int
+)
+
+data class DayStatResponse(
+    val date: LocalDate,
+    val count: Int,
+    val xpGained: Int
+)
+
 private fun UserProgress.toResponse() = UserProgressResponse(
     xp = xp,
     level = level,
@@ -61,4 +79,12 @@ private fun EarnedBadge.toResponse() = BadgeResponse(
     description = code.description,
     emoji = code.emoji,
     earnedAt = earnedAt
+)
+
+private fun UserStats.toResponse() = StatsResponse(
+    last7Days = last7Days.map { DayStatResponse(it.date, it.count, it.xpGained) },
+    streak = streak,
+    xpThisWeek = xpThisWeek,
+    xpLastWeek = xpLastWeek,
+    completionsThisWeek = completionsThisWeek
 )

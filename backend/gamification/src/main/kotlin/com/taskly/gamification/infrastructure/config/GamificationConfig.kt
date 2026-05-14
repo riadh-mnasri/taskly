@@ -1,6 +1,7 @@
 package com.taskly.gamification.infrastructure.config
 
 import com.taskly.gamification.application.GamificationService
+import com.taskly.gamification.infrastructure.adapter.outbound.persistence.DailyCompletionJpaRepository
 import com.taskly.gamification.infrastructure.adapter.outbound.persistence.GamificationRepositoryAdapter
 import com.taskly.gamification.infrastructure.adapter.outbound.persistence.UserBadgeJpaRepository
 import com.taskly.gamification.infrastructure.adapter.outbound.persistence.UserProgressJpaRepository
@@ -13,9 +14,10 @@ class GamificationConfig {
     @Bean
     fun gamificationRepositoryAdapter(
         progressRepo: UserProgressJpaRepository,
-        badgeRepo: UserBadgeJpaRepository
+        badgeRepo: UserBadgeJpaRepository,
+        dailyRepo: DailyCompletionJpaRepository
     ): GamificationRepositoryAdapter =
-        GamificationRepositoryAdapter(progressRepo, badgeRepo)
+        GamificationRepositoryAdapter(progressRepo, badgeRepo, dailyRepo)
 
     @Bean
     fun gamificationService(repo: GamificationRepositoryAdapter): GamificationService =

@@ -20,11 +20,29 @@ export interface UserProgressResponse {
   badges: BadgeResponse[];
 }
 
+export interface DayStatResponse {
+  date: string;
+  count: number;
+  xpGained: number;
+}
+
+export interface StatsResponse {
+  last7Days: DayStatResponse[];
+  streak: number;
+  xpThisWeek: number;
+  xpLastWeek: number;
+  completionsThisWeek: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GamificationService {
   private readonly http = inject(HttpClient);
 
   getProgress(): Observable<UserProgressResponse> {
     return this.http.get<UserProgressResponse>('/api/v1/gamification/me');
+  }
+
+  getStats(): Observable<StatsResponse> {
+    return this.http.get<StatsResponse>('/api/v1/gamification/me/stats');
   }
 }

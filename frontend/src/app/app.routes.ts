@@ -44,6 +44,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/tasks/pages/calendar.page').then(m => m.CalendarPage)
       },
+      {
+        path: 'stats',
+        loadComponent: () =>
+          import('./features/gamification/stats.page').then(m => m.StatsPage)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

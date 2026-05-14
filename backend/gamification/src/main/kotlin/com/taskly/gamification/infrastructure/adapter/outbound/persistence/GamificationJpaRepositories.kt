@@ -29,3 +29,17 @@ interface UserBadgeJpaRepository : JpaRepository<UserBadgeJpaEntity, Long> {
     fun existsByUserIdAndBadgeCode(userId: String, badgeCode: BadgeCode): Boolean
     fun findAllByUserId(userId: String): List<UserBadgeJpaEntity>
 }
+
+interface DailyCompletionJpaRepository : JpaRepository<DailyCompletionJpaEntity, DailyCompletionId> {
+    @Modifying
+    @Query("""
+        INSERT INTO daily_completions (user_id, completion_date, count, xp_gained)
+        VALUES (:userId, CURRENT_DATE, 1, :xp)
+        ON CONFLICT (user_id, completion_date)
+        DO UPDATE SET count = daily_completions.count + 1, xp_gained = daily_completions.xp_gained + :xp
+    """, nativeQuery = true)
+    fun upsertToday(userId: String, xp: Int)
+
+    @Query("SELECT d FROM DailyCompletionJpaEntity d WHERE d.userId = :userId AND d.completionDate >= :from ORDER BY d.completionDate ASC")
+    fun findSince(userId: String, from: java.time.LocalDate): List<DailyCompletionJpaEntity>
+}
