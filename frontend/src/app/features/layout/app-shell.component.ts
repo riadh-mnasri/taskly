@@ -88,6 +88,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
             <mat-icon>view_kanban</mat-icon>
             <span>Kanban</span>
           </a>
+          <a class="nav-link" routerLink="/calendar" routerLinkActive="active">
+            <mat-icon>calendar_month</mat-icon>
+            <span>Calendrier</span>
+          </a>
         </nav>
 
         <!-- User -->
@@ -136,6 +140,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
             <a mat-menu-item routerLink="/dashboard"><mat-icon>dashboard</mat-icon> Dashboard</a>
             <a mat-menu-item routerLink="/tasks"><mat-icon>checklist</mat-icon> Mes tâches</a>
             <a mat-menu-item routerLink="/kanban"><mat-icon>view_kanban</mat-icon> Kanban</a>
+            <a mat-menu-item routerLink="/calendar"><mat-icon>calendar_month</mat-icon> Calendrier</a>
             <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon> Se déconnecter</button>
             <div style="padding:8px 16px;font-size:11px;color:#9ca3af;border-top:1px solid #f3f4f6;margin-top:4px;">
               © {{ currentYear }} WeHighTech

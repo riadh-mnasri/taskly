@@ -39,6 +39,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/tasks/pages/kanban.page').then(m => m.KanbanPage)
       },
+      {
+        path: 'calendar',
+        loadComponent: () =>
+          import('./features/tasks/pages/calendar.page').then(m => m.CalendarPage)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

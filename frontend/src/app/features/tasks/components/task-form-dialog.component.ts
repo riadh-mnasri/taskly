@@ -14,6 +14,7 @@ import { Task, Priority, TaskType, TaskStatus, CreateTaskRequest, TaskFormResult
 
 export interface TaskFormDialogData {
   task?: Task;
+  prefillDate?: Date;
 }
 
 @Component({
@@ -168,7 +169,7 @@ export class TaskFormDialogComponent implements OnInit {
       subject:                  [task?.subject ?? '',           [Validators.required, Validators.maxLength(100)]],
       priority:                 [task?.priority ?? 'MEDIUM' as Priority, Validators.required],
       type:                     [task?.type ?? 'HOMEWORK' as TaskType,   Validators.required],
-      dueDate:                  [task ? new Date(task.dueDate + 'T00:00:00') : null, Validators.required],
+      dueDate:                  [task ? new Date(task.dueDate + 'T00:00:00') : (this.data.prefillDate ?? null), Validators.required],
       estimatedDurationMinutes: [task?.estimatedDurationMinutes ?? 30, [Validators.required, Validators.min(1), Validators.max(480)]],
       status:                   [task?.status ?? 'TODO' as TaskStatus]
     });
