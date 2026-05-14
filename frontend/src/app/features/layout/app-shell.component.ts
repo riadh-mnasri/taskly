@@ -91,7 +91,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
         </nav>
 
         <!-- User -->
-        <div class="border-t mx-4 mb-4" style="border-color:rgba(255,255,255,0.1);padding-top:16px;">
+        <div class="border-t mx-4 mb-2" style="border-color:rgba(255,255,255,0.1);padding-top:16px;">
           <button
             class="nav-link w-full"
             style="width:calc(100% - 0px);margin:0;"
@@ -110,6 +110,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
               <mat-icon>logout</mat-icon> Se déconnecter
             </button>
           </mat-menu>
+        </div>
+
+        <!-- Copyright -->
+        <div class="px-5 pb-4 text-center">
+          <p style="color:rgba(255,255,255,0.35);font-size:11px;line-height:1.5;">
+            © {{ currentYear }} WeHighTech<br>Tous droits réservés
+          </p>
         </div>
       </aside>
 
@@ -130,6 +137,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
             <a mat-menu-item routerLink="/tasks"><mat-icon>checklist</mat-icon> Mes tâches</a>
             <a mat-menu-item routerLink="/kanban"><mat-icon>view_kanban</mat-icon> Kanban</a>
             <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon> Se déconnecter</button>
+            <div style="padding:8px 16px;font-size:11px;color:#9ca3af;border-top:1px solid #f3f4f6;margin-top:4px;">
+              © {{ currentYear }} WeHighTech
+            </div>
           </mat-menu>
         </header>
 
@@ -145,6 +155,8 @@ export class AppShellComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
+
+  readonly currentYear = new Date().getFullYear();
 
   readonly isHandset = toSignal(
     this.breakpointObserver.observe(Breakpoints.Handset).pipe(map(r => r.matches)),
