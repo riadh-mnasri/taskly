@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-sent-reminders
+      author: taskly
+      changes:
+        - createTable:
+            tableName: sent_reminders
+            columns:
+              - column:
+                  name: task_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reminder_type
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sent_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: sent_reminders
+            columnNames: task_id, reminder_type
+            constraintName: pk_sent_reminders

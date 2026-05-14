@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/004-create-user-badges.yaml
   - include:
       file: db/changelog/005-create-daily-completions.yaml
+  - include:
+      file: db/changelog/006-create-sent-reminders.yaml
