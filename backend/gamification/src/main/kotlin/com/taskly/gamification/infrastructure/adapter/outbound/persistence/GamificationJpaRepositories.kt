@@ -30,6 +30,10 @@ interface UserBadgeJpaRepository : JpaRepository<UserBadgeJpaEntity, Long> {
     fun findAllByUserId(userId: String): List<UserBadgeJpaEntity>
 }
 
+interface RewardedTaskJpaRepository : JpaRepository<RewardedTaskJpaEntity, java.util.UUID> {
+    fun existsByTaskId(taskId: java.util.UUID): Boolean
+}
+
 interface DailyCompletionJpaRepository : JpaRepository<DailyCompletionJpaEntity, DailyCompletionId> {
     @Modifying
     @Query("""

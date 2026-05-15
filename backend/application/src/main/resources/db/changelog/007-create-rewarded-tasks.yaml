@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-rewarded-tasks
+      author: taskly
+      changes:
+        - createTable:
+            tableName: rewarded_tasks
+            columns:
+              - column:
+                  name: task_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rewarded_at
+                  type: TIMESTAMP
+                  defaultValueComputed: NOW()
+                  constraints:
+                    nullable: false

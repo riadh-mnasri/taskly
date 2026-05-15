@@ -16,4 +16,6 @@ interface UserProgressRepository {
     fun initIfAbsent(userId: String)
     fun recordDailyCompletion(userId: String, xp: Int)
     fun findDailySince(userId: String, from: LocalDate): List<DayStat>
+    fun hasBeenRewarded(taskId: String): Boolean
+    fun markRewarded(taskId: String)
 }

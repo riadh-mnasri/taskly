@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/005-create-daily-completions.yaml
   - include:
       file: db/changelog/006-create-sent-reminders.yaml
+  - include:
+      file: db/changelog/007-create-rewarded-tasks.yaml

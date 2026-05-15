@@ -11,7 +11,8 @@ import java.time.LocalDate
 class GamificationRepositoryAdapter(
     private val progressRepo: UserProgressJpaRepository,
     private val badgeRepo: UserBadgeJpaRepository,
-    private val dailyRepo: DailyCompletionJpaRepository
+    private val dailyRepo: DailyCompletionJpaRepository,
+    private val rewardedRepo: RewardedTaskJpaRepository
 ) : UserProgressRepository {
 
     override fun initIfAbsent(userId: String) {
@@ -47,4 +48,11 @@ class GamificationRepositoryAdapter(
 
     override fun findDailySince(userId: String, from: LocalDate): List<DayStat> =
         dailyRepo.findSince(userId, from).map { DayStat(it.completionDate, it.count, it.xpGained) }
+
+    override fun hasBeenRewarded(taskId: String): Boolean =
+        rewardedRepo.existsByTaskId(java.util.UUID.fromString(taskId))
+
+    override fun markRewarded(taskId: String) {
+        rewardedRepo.save(RewardedTaskJpaEntity(taskId = java.util.UUID.fromString(taskId)))
+    }
 }
