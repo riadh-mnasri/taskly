@@ -1,0 +1,4 @@
+{
+  "outputDirectory": "dist/taskly/browser",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
