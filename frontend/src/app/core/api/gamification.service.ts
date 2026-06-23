@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface BadgeResponse {
   code: string;
@@ -37,12 +38,13 @@ export interface StatsResponse {
 @Injectable({ providedIn: 'root' })
 export class GamificationService {
   private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/gamification`;
 
   getProgress(): Observable<UserProgressResponse> {
-    return this.http.get<UserProgressResponse>('/api/v1/gamification/me');
+    return this.http.get<UserProgressResponse>(`${this.apiUrl}/me`);
   }
 
   getStats(): Observable<StatsResponse> {
-    return this.http.get<StatsResponse>('/api/v1/gamification/me/stats');
+    return this.http.get<StatsResponse>(`${this.apiUrl}/me/stats`);
   }
 }
