@@ -47,9 +47,7 @@ taskly:
   cors:
     allowed-origins: ${TASKLY_CORS_ALLOWED_ORIGINS:http://localhost:4201}
   jwt:
-    # WARNING: This is a dev-only secret. Never commit real secrets to production repositories.
-    # In production, inject via environment variable: TASKLY_JWT_SECRET
-    secret: "taskly-dev-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm-security"
+    secret: ${TASKLY_JWT_SECRET}
     access-token-expiry-seconds: 900      # 15 minutes
     refresh-token-expiry-seconds: 604800  # 7 days
 
