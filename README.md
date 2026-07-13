@@ -10,7 +10,7 @@
 
 ## Live Demo
 
-- **App:** https://frontend-kappa-lilac-83.vercel.app
+- **App:** https://taskly-frontend-brown.vercel.app
 - **API:** https://backend-production-a738.up.railway.app (health: `/actuator/health`, docs: `/swagger-ui.html`)
 
 **Demo credentials:**
