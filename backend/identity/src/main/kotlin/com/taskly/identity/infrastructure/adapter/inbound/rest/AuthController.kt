@@ -2,16 +2,25 @@ package com.taskly.identity.infrastructure.adapter.inbound.rest
 
 import com.taskly.identity.domain.port.inbound.AuthenticateUserCommand
 import com.taskly.identity.domain.port.inbound.AuthenticateUserUseCase
+import com.taskly.identity.domain.port.inbound.GetCurrentUserUseCase
 import com.taskly.identity.domain.port.inbound.RefreshTokenCommand
 import com.taskly.identity.domain.port.inbound.RefreshTokenUseCase
 import com.taskly.identity.domain.port.inbound.RegisterUserCommand
 import com.taskly.identity.domain.port.inbound.RegisterUserUseCase
+import com.taskly.sharedkernel.domain.model.UserId
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
+import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,7 +33,9 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val registerUser: RegisterUserUseCase,
     private val authenticateUser: AuthenticateUserUseCase,
-    private val refreshToken: RefreshTokenUseCase
+    private val refreshToken: RefreshTokenUseCase,
+    private val getCurrentUser: GetCurrentUserUseCase,
+    @Value("\${taskly.jwt.refresh-token-expiry-seconds:604800}") private val refreshTokenExpirySeconds: Long
 ) {
 
     @PostMapping("/sign-up")
@@ -38,27 +49,56 @@ class AuthController(
     }
 
     @PostMapping("/sign-in")
-    @Operation(summary = "Authenticate and receive JWT tokens")
-    fun signIn(@Valid @RequestBody request: SignInRequest): TokenResponse {
+    @Operation(summary = "Authenticate and set session cookies")
+    fun signIn(@Valid @RequestBody request: SignInRequest, response: HttpServletResponse): ExpiryResponse {
         val tokens = authenticateUser.authenticate(
             AuthenticateUserCommand(email = request.email, rawPassword = request.password)
         )
-        return TokenResponse(
-            accessToken = tokens.accessToken,
-            refreshToken = tokens.refreshToken,
-            expiresIn = tokens.expiresIn
-        )
+        setSessionCookies(response, tokens.accessToken, tokens.refreshToken, tokens.expiresIn)
+        return ExpiryResponse(expiresIn = tokens.expiresIn)
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh access token using a refresh token")
-    fun refresh(@Valid @RequestBody request: RefreshRequest): TokenResponse {
-        val tokens = refreshToken.refresh(RefreshTokenCommand(refreshToken = request.refreshToken))
-        return TokenResponse(
-            accessToken = tokens.accessToken,
-            refreshToken = tokens.refreshToken,
-            expiresIn = tokens.expiresIn
-        )
+    @Operation(summary = "Refresh the session using the refresh token cookie")
+    fun refresh(
+        @CookieValue("refresh_token") refreshTokenCookie: String,
+        response: HttpServletResponse
+    ): ExpiryResponse {
+        val tokens = refreshToken.refresh(RefreshTokenCommand(refreshToken = refreshTokenCookie))
+        setSessionCookies(response, tokens.accessToken, tokens.refreshToken, tokens.expiresIn)
+        return ExpiryResponse(expiresIn = tokens.expiresIn)
+    }
+
+    @PostMapping("/sign-out")
+    @Operation(summary = "Clear session cookies")
+    fun signOut(response: HttpServletResponse) {
+        clearCookie(response, "access_token")
+        clearCookie(response, "refresh_token")
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Get the currently authenticated user")
+    fun me(authentication: Authentication): CurrentUserResponse {
+        val view = getCurrentUser.getCurrentUser(UserId.of(authentication.principal as String))
+        return CurrentUserResponse(email = view.email)
+    }
+
+    private fun setSessionCookies(response: HttpServletResponse, accessToken: String, refreshToken: String, accessTokenExpiresIn: Long) {
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("access_token", accessToken, accessTokenExpiresIn).toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("refresh_token", refreshToken, refreshTokenExpirySeconds).toString())
+    }
+
+    private fun sessionCookie(name: String, value: String, maxAgeSeconds: Long): ResponseCookie =
+        ResponseCookie.from(name, value)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Lax")
+            .path("/")
+            .maxAge(maxAgeSeconds)
+            .build()
+
+    private fun clearCookie(response: HttpServletResponse, name: String) {
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie(name, "", 0).toString())
     }
 }
 
@@ -79,11 +119,8 @@ data class SignInRequest(
     val password: String
 )
 
-data class RefreshRequest(
-    @field:NotBlank(message = "Refresh token is required")
-    val refreshToken: String
-)
-
 data class SignUpResponse(val userId: String, val email: String)
 
-data class TokenResponse(val accessToken: String, val refreshToken: String, val expiresIn: Long)
+data class ExpiryResponse(val expiresIn: Long)
+
+data class CurrentUserResponse(val email: String)

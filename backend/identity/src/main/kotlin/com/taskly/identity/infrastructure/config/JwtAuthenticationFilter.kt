@@ -20,7 +20,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = extractBearerToken(request)
+        val token = extractAccessToken(request)
 
         if (token != null && SecurityContextHolder.getContext().authentication == null) {
             try {
@@ -40,7 +40,10 @@ class JwtAuthenticationFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun extractBearerToken(request: HttpServletRequest): String? {
+    private fun extractAccessToken(request: HttpServletRequest): String? {
+        val cookieToken = request.cookies?.firstOrNull { it.name == "access_token" }?.value
+        if (!cookieToken.isNullOrBlank()) return cookieToken
+
         val header = request.getHeader("Authorization") ?: return null
         if (!header.startsWith("Bearer ")) return null
         return header.substring(7).takeIf { it.isNotBlank() }

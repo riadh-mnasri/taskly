@@ -1,80 +1,84 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
+  let router: Router;
 
   beforeEach(() => {
-    localStorage.clear();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [AuthService]
     });
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
   });
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should not be authenticated initially when no token in localStorage', () => {
+  it('should not be authenticated before ensureAuthChecked resolves', () => {
     expect(service.isAuthenticated()).toBeFalse();
   });
 
-  it('should be authenticated when token exists in localStorage at service init', () => {
-    localStorage.setItem('taskly_access_token', 'test-token');
-    // Re-create service within TestBed to pick up localStorage state
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule],
-      providers: [AuthService]
-    });
-    const freshService = TestBed.inject(AuthService);
-    expect(freshService.isAuthenticated()).toBeTrue();
-    expect(freshService.getAccessToken()).toBe('test-token');
+  it('resolves authenticated true when /me succeeds', async () => {
+    const promise = service.ensureAuthChecked();
+    httpMock.expectOne('/api/v1/auth/me').flush({ email: 'demo@taskly.app' });
+
+    expect(await promise).toBeTrue();
+    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.currentUserName()).toBe('Demo');
   });
 
-  it('should store tokens and set authenticated after sign-in', () => {
-    const mockResponse = {
-      accessToken: 'access-token',
-      refreshToken: 'refresh-token',
-      expiresIn: 900
-    };
+  it('falls back to /refresh then retries /me when the first /me call fails', async () => {
+    const promise = service.ensureAuthChecked();
+    httpMock.expectOne('/api/v1/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+    httpMock.expectOne('/api/v1/auth/refresh').flush({ expiresIn: 900 });
+    httpMock.expectOne('/api/v1/auth/me').flush({ email: 'demo@taskly.app' });
 
-    service.signIn({ email: 'test@test.com', password: 'Password1!' }).subscribe(() => {
-      expect(service.isAuthenticated()).toBeTrue();
-      expect(localStorage.getItem('taskly_access_token')).toBe('access-token');
-    });
-
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/auth/sign-in');
-    expect(req.request.method).toBe('POST');
-    req.flush(mockResponse);
+    expect(await promise).toBeTrue();
+    expect(service.isAuthenticated()).toBeTrue();
   });
 
-  it('should clear tokens on sign-out', () => {
-    localStorage.setItem('taskly_access_token', 'test-token');
+  it('resolves authenticated false when /me and /refresh both fail', async () => {
+    const promise = service.ensureAuthChecked();
+    httpMock.expectOne('/api/v1/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+    httpMock.expectOne('/api/v1/auth/refresh').flush(null, { status: 401, statusText: 'Unauthorized' });
 
+    expect(await promise).toBeFalse();
+    expect(service.isAuthenticated()).toBeFalse();
+  });
+
+  it('caches the auth check so /me is only called once', async () => {
+    const first = service.ensureAuthChecked();
+    httpMock.expectOne('/api/v1/auth/me').flush({ email: 'demo@taskly.app' });
+    await first;
+
+    const second = service.ensureAuthChecked();
+    expect(await second).toBeTrue();
+    httpMock.expectNone('/api/v1/auth/me');
+  });
+
+  it('signOut clears state and navigates to sign-in', async () => {
+    const promise = service.ensureAuthChecked();
+    httpMock.expectOne('/api/v1/auth/me').flush({ email: 'demo@taskly.app' });
+    await promise;
+
+    const navigateSpy = spyOn(router, 'navigate');
     service.signOut();
+    httpMock.expectOne('/api/v1/auth/sign-out').flush({});
 
     expect(service.isAuthenticated()).toBeFalse();
-    expect(localStorage.getItem('taskly_access_token')).toBeNull();
-  });
-
-  it('should return access token via signal after sign-in', () => {
-    const mockResponse = { accessToken: 'my-token', refreshToken: 'r', expiresIn: 900 };
-    service.signIn({ email: 'a@b.com', password: 'P1!' }).subscribe(() => {
-      expect(service.getAccessToken()).toBe('my-token');
-    });
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/auth/sign-in');
-    req.flush(mockResponse);
+    expect(navigateSpy).toHaveBeenCalledWith(['/auth/sign-in']);
   });
 });

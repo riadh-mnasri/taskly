@@ -41,7 +41,7 @@ describe('TaskService', () => {
       expect(tasks).toEqual([mockTask]);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/tasks');
+    const req = httpMock.expectOne('/api/v1/tasks');
     expect(req.request.method).toBe('GET');
     req.flush([mockTask]);
   });
@@ -61,7 +61,7 @@ describe('TaskService', () => {
       expect(task.title).toBe('New task');
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/tasks');
+    const req = httpMock.expectOne('/api/v1/tasks');
     expect(req.request.method).toBe('POST');
     expect(req.request.body.title).toBe('New task');
     req.flush({ ...mockTask, title: 'New task' });
@@ -70,7 +70,7 @@ describe('TaskService', () => {
   it('should DELETE a task', () => {
     service.delete('123').subscribe();
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/tasks/123');
+    const req = httpMock.expectOne('/api/v1/tasks/123');
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });
@@ -80,7 +80,7 @@ describe('TaskService', () => {
       expect(task.status).toBe('DONE');
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/tasks/123/status');
+    const req = httpMock.expectOne('/api/v1/tasks/123/status');
     expect(req.request.method).toBe('PATCH');
     expect(req.request.body.status).toBe('DONE');
     req.flush({ ...mockTask, status: 'DONE' });
@@ -90,7 +90,7 @@ describe('TaskService', () => {
     service.list({ priority: 'HIGH', status: 'TODO' }).subscribe();
 
     const req = httpMock.expectOne(r =>
-      r.url === 'http://localhost:8080/api/v1/tasks' &&
+      r.url === '/api/v1/tasks' &&
       r.params.get('priority') === 'HIGH' &&
       r.params.get('status') === 'TODO'
     );

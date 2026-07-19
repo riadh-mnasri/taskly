@@ -8,13 +8,15 @@ export interface SignInRequest {
   password: string;
 }
 
-export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
+export interface ExpiryResponse {
   expiresIn: number;
 }
 
 export interface SignUpResponse {
   userId: string;
+  email: string;
+}
+
+export interface CurrentUserResponse {
   email: string;
 }

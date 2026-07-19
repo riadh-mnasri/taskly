@@ -1,9 +1,11 @@
 package com.taskly.identity.infrastructure.config
 
 import com.taskly.identity.application.service.AuthenticateUserService
+import com.taskly.identity.application.service.GetCurrentUserService
 import com.taskly.identity.application.service.RefreshTokenService
 import com.taskly.identity.application.service.RegisterUserService
 import com.taskly.identity.domain.port.inbound.AuthenticateUserUseCase
+import com.taskly.identity.domain.port.inbound.GetCurrentUserUseCase
 import com.taskly.identity.domain.port.inbound.RefreshTokenUseCase
 import com.taskly.identity.domain.port.inbound.RegisterUserUseCase
 import com.taskly.identity.domain.port.outbound.PasswordHasher
@@ -52,6 +54,10 @@ class IdentityConfig {
         userRepository: UserRepository,
         tokenGenerator: TokenGenerator
     ): RefreshTokenUseCase = RefreshTokenService(userRepository, tokenGenerator)
+
+    @Bean
+    fun getCurrentUserUseCase(userRepository: UserRepository): GetCurrentUserUseCase =
+        GetCurrentUserService(userRepository)
 
     @Bean
     fun jwtAuthenticationFilter(tokenGenerator: TokenGenerator): JwtAuthenticationFilter =
