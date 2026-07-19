@@ -112,12 +112,17 @@ import { AuthService } from '../../../core/auth/auth.service';
             Pas encore de compte ?
             <a routerLink="/auth/sign-up" class="text-violet-600 font-semibold hover:underline ml-1">Créer un compte</a>
           </p>
+
+          <p class="text-center mt-8" style="color:#9ca3af;font-size:11px;">
+            © {{ currentYear }} Riadh MNASRI
+          </p>
         </div>
       </div>
     </div>
   `
 })
 export class SignInComponent {
+  readonly currentYear = new Date().getFullYear();
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);

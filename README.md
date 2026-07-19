@@ -89,3 +89,7 @@ v0.1.0 shipped as a focused MVP; several items originally deferred to v0.2.0 (ca
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Author
+
+© 2026 [Riadh MNASRI](mailto:riadh.mnasri@gmail.com)
