@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://backend-production-5068.up.railway.app'
+  apiUrl: 'https://taskly-backend-4nh4.onrender.com'
 };
