@@ -29,6 +29,7 @@ export interface DayStatResponse {
 
 export interface StatsResponse {
   last7Days: DayStatResponse[];
+  last30Days: DayStatResponse[];
   streak: number;
   xpThisWeek: number;
   xpLastWeek: number;

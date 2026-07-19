@@ -51,6 +51,7 @@ data class BadgeResponse(
 
 data class StatsResponse(
     val last7Days: List<DayStatResponse>,
+    val last30Days: List<DayStatResponse>,
     val streak: Int,
     val xpThisWeek: Int,
     val xpLastWeek: Int,
@@ -83,6 +84,7 @@ private fun EarnedBadge.toResponse() = BadgeResponse(
 
 private fun UserStats.toResponse() = StatsResponse(
     last7Days = last7Days.map { DayStatResponse(it.date, it.count, it.xpGained) },
+    last30Days = last30Days.map { DayStatResponse(it.date, it.count, it.xpGained) },
     streak = streak,
     xpThisWeek = xpThisWeek,
     xpLastWeek = xpLastWeek,

@@ -1,10 +1,16 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { GamificationService, StatsResponse } from '../../core/api/gamification.service';
-import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip } from 'chart.js';
+import {
+  Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend,
+  LineController, LineElement, PointElement, Filler
+} from 'chart.js';
 
-Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
+Chart.register(
+  BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend,
+  LineController, LineElement, PointElement, Filler
+);
 
 const FR_DAYS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
@@ -74,6 +80,17 @@ const FR_DAYS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
           </div>
         </div>
 
+        <!-- Trend line chart (30 days) -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mt-6" style="border:1px solid #e5e7eb;">
+          <h2 class="font-bold text-gray-700 mb-4 text-sm flex items-center gap-2">
+            <mat-icon style="font-size:18px;width:18px;height:18px;color:#7c3aed;">show_chart</mat-icon>
+            Tendance de productivité — 30 derniers jours
+          </h2>
+          <div style="position:relative;height:260px;">
+            <canvas #trendCanvas></canvas>
+          </div>
+        </div>
+
         <!-- Streak message -->
         <div *ngIf="stats.streak >= 3"
              class="mt-4 rounded-2xl p-4 flex items-center gap-3"
@@ -106,10 +123,13 @@ const FR_DAYS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 })
 export class StatsPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('trendCanvas') trendCanvasRef!: ElementRef<HTMLCanvasElement>;
 
   private readonly service = inject(GamificationService);
+  private readonly cdr = inject(ChangeDetectorRef);
   stats: StatsResponse | null = null;
   private chart: Chart | null = null;
+  private trendChart: Chart | null = null;
 
   get xpTrend(): number {
     return (this.stats?.xpThisWeek ?? 0) - (this.stats?.xpLastWeek ?? 0);
@@ -125,7 +145,9 @@ export class StatsPage implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.service.getStats().subscribe(stats => {
       this.stats = stats;
-      setTimeout(() => this.renderChart(), 0);
+      this.cdr.detectChanges();
+      this.renderChart();
+      this.renderTrendChart();
     });
   }
 
@@ -133,6 +155,7 @@ export class StatsPage implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.chart?.destroy();
+    this.trendChart?.destroy();
   }
 
   private renderChart(): void {
@@ -175,6 +198,80 @@ export class StatsPage implements OnInit, AfterViewInit, OnDestroy {
             ticks: { stepSize: 1, precision: 0 },
             grid: { color: 'rgba(0,0,0,0.05)' },
             border: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  private renderTrendChart(): void {
+    if (!this.trendCanvasRef || !this.stats) return;
+
+    const days = this.stats.last30Days;
+    const labels = days.map(d => {
+      const date = new Date(d.date + 'T00:00:00');
+      return `${date.getDate()}/${date.getMonth() + 1}`;
+    });
+    const completions = days.map(d => d.count);
+    const xp = days.map(d => d.xpGained);
+
+    this.trendChart?.destroy();
+    this.trendChart = new Chart(this.trendCanvasRef.nativeElement, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Tâches complétées',
+            data: completions,
+            borderColor: '#7c3aed',
+            backgroundColor: 'rgba(124,58,237,0.1)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.3,
+            fill: true,
+            yAxisID: 'y'
+          },
+          {
+            label: 'XP gagné',
+            data: xp,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.3,
+            fill: true,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: { maxTicksLimit: 10 }
+          },
+          y: {
+            beginAtZero: true,
+            position: 'left',
+            ticks: { stepSize: 1, precision: 0 },
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            border: { display: false },
+            title: { display: true, text: 'Tâches', color: '#7c3aed', font: { size: 11 } }
+          },
+          y1: {
+            beginAtZero: true,
+            position: 'right',
+            grid: { display: false },
+            border: { display: false },
+            title: { display: true, text: 'XP', color: '#10b981', font: { size: 11 } }
           }
         }
       }

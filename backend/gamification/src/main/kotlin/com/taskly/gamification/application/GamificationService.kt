@@ -55,11 +55,13 @@ class GamificationService(
     fun getStats(userId: String): UserStats {
         repo.initIfAbsent(userId)
         val today    = LocalDate.now()
-        val last7Days  = repo.findDailySince(userId, today.minusDays(6))
         val last14Days = repo.findDailySince(userId, today.minusDays(13))
+        val last30Days = repo.findDailySince(userId, today.minusDays(29))
+        val last7Days = last30Days.filter { it.date >= today.minusDays(6) }
 
         return UserStats(
-            last7Days            = fillMissingDays(last7Days, today),
+            last7Days            = fillMissingDays(last7Days, today, 6),
+            last30Days           = fillMissingDays(last30Days, today, 29),
             streak               = computeStreak(last14Days, today),
             xpThisWeek           = last7Days.sumOf { it.xpGained },
             xpLastWeek           = last14Days.filter { it.date < today.minusDays(6) }.sumOf { it.xpGained },
@@ -67,9 +69,9 @@ class GamificationService(
         )
     }
 
-    private fun fillMissingDays(data: List<DayStat>, today: LocalDate): List<DayStat> {
+    private fun fillMissingDays(data: List<DayStat>, today: LocalDate, dayOffsetSpan: Int): List<DayStat> {
         val byDate = data.associateBy { it.date }
-        return (6 downTo 0).map { offset ->
+        return (dayOffsetSpan downTo 0).map { offset ->
             val date = today.minusDays(offset.toLong())
             byDate[date] ?: DayStat(date, 0, 0)
         }
@@ -95,6 +97,7 @@ class GamificationService(
 
 data class UserStats(
     val last7Days: List<DayStat>,
+    val last30Days: List<DayStat>,
     val streak: Int,
     val xpThisWeek: Int,
     val xpLastWeek: Int,
