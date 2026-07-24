@@ -134,7 +134,7 @@ Create a new task.
 }
 ```
 
-**Response 201:** — same as task object above
+**Response 201:** same as task object above
 
 **Errors:** `400` validation error (e.g., past due date, blank title)
 
@@ -143,7 +143,7 @@ Create a new task.
 ### GET /api/v1/tasks/{id}
 Get a single task by ID.
 
-**Response 200:** — task object
+**Response 200:** task object
 
 **Errors:** `404` not found or not owned by user
 
@@ -154,7 +154,7 @@ Update a task (full update).
 
 **Request:** same shape as POST
 
-**Response 200:** — updated task object
+**Response 200:** updated task object
 
 ---
 
@@ -175,7 +175,7 @@ Update task status only.
 }
 ```
 
-**Response 200:** — updated task object
+**Response 200:** updated task object
 
 ---
 

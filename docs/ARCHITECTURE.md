@@ -1,6 +1,6 @@
 # Taskly Architecture
 
-## C4 Model — Context Diagram
+## C4 Model: Context Diagram
 
 ```mermaid
 C4Context
@@ -16,7 +16,7 @@ C4Context
     Rel(taskly, mailhog, "Sends emails (v0.2.0)", "SMTP")
 ```
 
-## C4 Model — Container Diagram
+## C4 Model: Container Diagram
 
 ```mermaid
 C4Container
@@ -82,15 +82,15 @@ graph TD
 
 | Term | Definition in Taskly |
 |------|---------------------|
-| **Aggregate** | `User`, `Task` — transactional boundary, consistency enforced within |
-| **Value Object** | `Email`, `Password`, `UserId`, `TaskId`, `Subject`, `Deadline`, `EstimatedDuration` — immutable, identity by value |
-| **Domain Event** | `UserRegistered` — signals that something meaningful happened in the domain |
-| **Use Case (Port)** | Interface in `domain.port.inbound` — e.g., `RegisterUserUseCase` |
-| **Repository (Port)** | Interface in `domain.port.outbound` — e.g., `UserRepository` |
+| **Aggregate** | `User`, `Task`: transactional boundary, consistency enforced within |
+| **Value Object** | `Email`, `Password`, `UserId`, `TaskId`, `Subject`, `Deadline`, `EstimatedDuration`: immutable, identity by value |
+| **Domain Event** | `UserRegistered`: signals that something meaningful happened in the domain |
+| **Use Case (Port)** | Interface in `domain.port.inbound`, e.g., `RegisterUserUseCase` |
+| **Repository (Port)** | Interface in `domain.port.outbound`, e.g., `UserRepository` |
 | **Application Service** | Implements a use case port, orchestrates domain objects and calls repository ports |
-| **Adapter** | Concrete implementation of a port — REST controller (inbound) or JPA repository (outbound) |
-| **Bounded Context** | `identity` and `task-management` — each with its own ubiquitous language |
-| **Shared Kernel** | `shared-kernel` module — `UserId` shared between contexts |
+| **Adapter** | Concrete implementation of a port: REST controller (inbound) or JPA repository (outbound) |
+| **Bounded Context** | `identity` and `task-management`: each with its own ubiquitous language |
+| **Shared Kernel** | `shared-kernel` module: `UserId` shared between contexts |
 
 ## Architecture Decision Records
 

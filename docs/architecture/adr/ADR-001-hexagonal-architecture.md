@@ -23,14 +23,14 @@ Key rules:
 
 **Positive:**
 - Domain logic is testable with pure JUnit (no Spring context needed)
-- Easy to swap adapters — e.g., replace PostgreSQL with MongoDB without touching domain
+- Easy to swap adapters, e.g., replace PostgreSQL with MongoDB without touching domain
 - Clear boundaries prevent accidental coupling between contexts
 - Scales naturally: add a new context = new module
 
 **Negative:**
 - More boilerplate than a simple layered architecture (DTOs, mappers, ports)
 - Steeper learning curve for developers unfamiliar with hexagonal architecture
-- Over-engineering risk for very small features — mitigated by pragmatic application (not every tiny thing needs a port)
+- Over-engineering risk for very small features: mitigated by pragmatic application (not every tiny thing needs a port)
 
 ## Alternatives Considered
 

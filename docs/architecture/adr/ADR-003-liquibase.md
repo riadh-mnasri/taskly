@@ -43,5 +43,5 @@ Key reasons for Liquibase:
 ## Alternatives Considered
 
 - **Flyway with SQL:** Simpler for SQL-heavy teams, but lacks rollback and precondition features.
-- **Manual SQL scripts:** No tracking, no checksums — rejected immediately.
-- **Hibernate `ddl-auto: create-drop`:** Only for local dev/test, never production — not a migration solution.
+- **Manual SQL scripts:** No tracking, no checksums; rejected immediately.
+- **Hibernate `ddl-auto: create-drop`:** Only for local dev/test, never production; not a migration solution.

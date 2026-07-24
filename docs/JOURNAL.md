@@ -24,7 +24,7 @@ _What's next._
 
 ---
 
-## 2026-05-10 — v0.1.0 Bootstrap
+## 2026-05-10: v0.1.0 Bootstrap
 
 **Author:** Taskly team
 **Summary:** Initial project scaffolding generated.
@@ -40,7 +40,7 @@ _What's next._
 ### Decisions made
 - JWT in localStorage for MVP (documented in ADR-002)
 - Liquibase over Flyway (documented in ADR-003)
-- MailHog wired but not used in v0.1.0 — placeholder for email features in v0.2.0
+- MailHog wired but not used in v0.1.0: placeholder for email features in v0.2.0
 
 ### Next steps
 - Run full verification checklist

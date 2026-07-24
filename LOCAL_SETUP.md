@@ -29,7 +29,7 @@ nvm install 20
 nvm use 20
 ```
 
-## Step 1 — Clone and Verify Structure
+## Step 1: Clone and Verify Structure
 
 ```bash
 git clone <repo-url> taskly
@@ -38,7 +38,7 @@ ls -la
 # Should show: backend/ frontend/ docker-compose.yml README.md ...
 ```
 
-## Step 2 — Start Infrastructure (PostgreSQL + MailHog)
+## Step 2: Start Infrastructure (PostgreSQL + MailHog)
 
 ```bash
 docker compose up -d
@@ -55,7 +55,7 @@ docker exec taskly-postgres psql -U taskly -d taskly -c '\dt'
 
 MailHog web UI (for future email features): http://localhost:8025
 
-## Step 3 — Build and Run the Backend
+## Step 3: Build and Run the Backend
 
 ```bash
 cd backend
@@ -84,7 +84,7 @@ docker exec taskly-postgres psql -U taskly -d taskly -c '\dt'
 
 Swagger UI: http://localhost:8081/swagger-ui.html
 
-## Step 4 — Install and Run the Frontend
+## Step 4: Install and Run the Frontend
 
 ```bash
 # In a new terminal
@@ -100,7 +100,7 @@ Expected output:
 
 Open: http://localhost:4201
 
-## Step 5 — Verify Everything Works
+## Step 5: Verify Everything Works
 
 1. Sign in with demo account:
    - Email: `demo@taskly.app`

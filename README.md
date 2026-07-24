@@ -1,6 +1,6 @@
 # Taskly
 
-> A task management app designed for middle school students (ages 11-15) to manage their homework, exams, and personal tasks with clarity — and stay motivated through gamification.
+> A task management app designed for middle school students (ages 11-15) to manage their homework, exams, and personal tasks with clarity, and stay motivated through gamification.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -34,16 +34,16 @@ Open http://localhost:4201 in your browser. See [LOCAL_SETUP.md](LOCAL_SETUP.md)
 
 ## Features
 
-- **Authentication** — Sign up, sign in, JWT access + refresh tokens
-- **Tasks** — Create, edit, delete tasks with title, description, subject, priority, due date, estimated duration, type
-- **List View** — Sortable, filterable table with color-coded priority badges (red/orange/green)
-- **Kanban View** — Drag & drop columns: To Do / In Progress / Done
-- **Calendar View** — Month view of tasks by due date (FullCalendar)
-- **Dashboard** — Today's tasks, this week's tasks, urgent items
-- **Gamification** — XP and levels for completed tasks, 6 earnable badges (first task, streaks, high-priority wins, no late tasks...), duplicate-reward-proof
-- **Statistics** — 7-day completion chart, current streak, weekly XP comparison
-- **Email Reminders** — Automated email 24h before a task's deadline (daily scheduled job)
-- **Persistence** — PostgreSQL 16 with Liquibase migrations
+- **Authentication**: Sign up, sign in, JWT access + refresh tokens
+- **Tasks**: Create, edit, delete tasks with title, description, subject, priority, due date, estimated duration, type
+- **List View**: Sortable, filterable table with color-coded priority badges (red/orange/green)
+- **Kanban View**: Drag & drop columns: To Do / In Progress / Done
+- **Calendar View**: Month view of tasks by due date (FullCalendar)
+- **Dashboard**: Today's tasks, this week's tasks, urgent items
+- **Gamification**: XP and levels for completed tasks, 6 earnable badges (first task, streaks, high-priority wins, no late tasks...), duplicate-reward-proof
+- **Statistics**: 7-day completion chart, current streak, weekly XP comparison
+- **Email Reminders**: Automated email 24h before a task's deadline (daily scheduled job)
+- **Persistence**: PostgreSQL 16 with Liquibase migrations
 
 ## Tech Stack
 
@@ -88,7 +88,7 @@ v0.1.0 shipped as a focused MVP; several items originally deferred to v0.2.0 (ca
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 ## Author
 
