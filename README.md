@@ -11,7 +11,7 @@
 ## Live Demo
 
 - **App:** https://taskly-frontend-brown.vercel.app
-- **API:** https://backend-production-a738.up.railway.app (health: `/actuator/health`, docs: `/swagger-ui.html`)
+- **API:** https://taskly-backend-4nh4.onrender.com (health: `/actuator/health`, docs: `/swagger-ui.html`)
 
 **Demo credentials:**
 - Email: `demo@taskly.app`
